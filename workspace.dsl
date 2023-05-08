@@ -12,7 +12,6 @@ workspace {
         bookStoreSystem = softwareSystem "Book Store System" "Books Store System allows users to get, search book records and administering book details" "Target System" {
             # Level 2: Container Diagram for Books Store System
             searchWebApi = container "Search Web API" "Provides book search functionality via a JSON/HTTPS API." "Go" "Web API"
-            adminWebApi = container "Admin Web API" "Provides book administration functionality via a JSON/HTTPS API." "Go" "Web API"
             publicWebApi = container "Public Web API" "Provides book details functionality via a JSON/HTTPS API." "Go" "Web API"
             bookKafkaSystem = container "Book Kafka System" "Handles book-related domain events." "Apache Kafka 3.0" "Kafka System"
             elasticSearchEventConsumer = container "ElasticSearch Event Consumer" "Consumes events and updates the search index." "Go" "Event Consumer"
@@ -20,6 +19,12 @@ workspace {
             relationalDatabase = container "Read/Write Relational Database" "Stores books details." "PostgreSQL" "Database"
             readerCache = container "Reader Cache" "Caches books details." "Memcached" "Cache"
             publisherRecurrentUpdater = container "Publisher Recurrent Updater" "Listening to external events coming from Publisher System." "Kafka" "Recurrent Updater"
+            adminWebApi = container "Admin Web API" "Provides book administration functionality via a JSON/HTTPS API." "Go" "Web API" {
+                # Level 3: Component Diagram
+                bookService = component "service.Book" "Allows administering book details." "Go"
+                authorizerService = component "service.Authorizer" "Allows authorizing books details." "Go"
+                eventsPublisherService = component "service.EventsPublisher" "Allows publishing books-related events." "Go"
+            }
         }
 
         # External Software Systems
@@ -58,6 +63,16 @@ workspace {
         }
         publisherRecurrentUpdater -> relationalDatabase "Updates the Read/Write Relational Database with detail from Publisher system" "JDBC"
         publisherRecurrentUpdater -> adminWebApi "Updating data via" "JSON/HTTPS"
+
+        # Relationship between Containers and External Systems
+        authorizedUser -> bookService "Administering book details via" "JSON/HTTPS"
+        authorizerService -> externalAuthorizeSystem "Authorizes users using"
+        eventsPublisherService -> bookKafkaSystem "Publishes books-related domain events to"
+        bookService -> relationalDatabase "Read from and write data to"
+        bookService -> authorizerService "Calls"
+        bookService -> eventsPublisherService "Calls" {
+            tags "Async Request"
+        }
     }
 
     views {
@@ -68,6 +83,11 @@ workspace {
         }
         # Level 2
         container bookStoreSystem "Containers" {
+            include *
+            autoLayout
+        }
+        # Level 3
+        component adminWebApi "Components" {
             include *
             autoLayout
         }
