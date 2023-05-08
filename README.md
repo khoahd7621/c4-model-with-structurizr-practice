@@ -15,7 +15,7 @@ The set contains these diagrams
 - Level 1 – Context Diagram for Books Store System
 - Level 2 – Container Diagram for Books Store System
 - Level 3 – Component Diagram for Admin Web API
-- Deployment Diagram – Microservices Deployment ‘Books Store System’ On AWS (Implementing)
+- Deployment Diagram – Microservices Deployment ‘Books Store System’ on AWS
 - Simple Dynamic Diagram – Workflow CI/CD for deploying ‘Books Store System’ using AWS services (Implementing)
 
 ### Requirements
